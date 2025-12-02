@@ -1,0 +1,79 @@
+﻿name: CI Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  run_app:
+    name: Run HelloWorld App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Run hello.py
+        run: python hello.py
+      
+      - name: Verify output
+        run: |
+          OUTPUT=$(python hello.py | grep -c 'Hello, DevOps!')
+          if [ $OUTPUT -eq 1 ]; then
+            echo '✅ Application output verified!'
+          else
+            echo '❌ Application output verification failed!'
+            exit 1
+          fi
+
+  run_scripts:
+    name: Run System Info Script
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Make script executable
+        run: chmod +x scripts/sysinfo.sh
+      
+      - name: Run sysinfo.sh
+        run: bash scripts/sysinfo.sh
+
+  build_docker:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Build Docker image
+        run: |
+          docker build -t hello-devops:latest .
+          docker images | grep hello-devops
+          echo '✅ Docker image built successfully!'
+
+  validate_nomad:
+    name: Validate Nomad Job File
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Install Nomad
+        run: |
+          NOMAD_VERSION=1.6.0
+          wget https://releases.hashicorp.com/nomad/$NOMAD_VERSION/nomad_$NOMAD_VERSION_linux_amd64.zip
+          unzip nomad_$NOMAD_VERSION_linux_amd64.zip
+          sudo mv nomad /usr/local/bin/
+          nomad version
+      
+      - name: Validate Nomad job file
+        run: nomad validate nomad/hello.nomad

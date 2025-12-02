@@ -1,0 +1,42 @@
+﻿LOKI SETUP & CONFIGURATION GUIDE
+==================================
+
+PART 1: START LOKI LOCALLY
+
+Option 1: Using Docker (Recommended)
+
+Step 1: Pull Loki image
+docker pull grafana/loki:latest
+
+Step 2: Create data directory
+mkdir -p loki-data
+
+Step 3: Run Loki container
+docker run -d --name loki -p 3100:3100 -v C:\Users\shahe\devops-intern-final/loki-data:/loki grafana/loki:latest
+
+Step 4: Verify Loki is running
+docker ps | grep loki
+
+PART 2: VERIFY LOKI IS WORKING
+
+Test 1: Check API endpoint
+curl http://localhost:3100/loki/api/v1/label
+
+Test 2: Check health endpoint
+curl http://localhost:3100/ready
+
+PART 3: CLEANUP
+
+docker stop loki
+docker rm loki
+rm -rf loki-data
+
+TROUBLESHOOTING
+
+Issue: Loki container won't start
+Solution: Check if port 3100 is in use
+lsof -i :3100
+
+Issue: Can't connect to Loki
+Solution: Verify container is running
+docker ps | grep loki
