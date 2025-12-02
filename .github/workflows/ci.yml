@@ -71,7 +71,7 @@ jobs:
         run: |
          NOMAD_VERSION=1.6.0
          wget https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip
-          unzip nomad_${NOMAD_VERSION}_linux_amd64.zip
+          unzip -o nomad_${NOMAD_VERSION}_linux_amd64.zip
           chmod +x nomad
           sudo mv nomad /usr/local/bin/nomad
           which nomad
