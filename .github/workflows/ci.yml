@@ -1,4 +1,4 @@
-﻿name: CI Pipeline
+name: CI Pipeline
 
 on:
   push:
@@ -26,11 +26,11 @@ jobs:
       
       - name: Verify output
         run: |
-          OUTPUT=$(python hello.py | grep -c 'Hello, DevOps!')
-          if [ $OUTPUT -eq 1 ]; then
-            echo '✅ Application output verified!'
+          OUTPUT=$(python hello.py | grep -c "Hello, DevOps!")
+          if [ "$OUTPUT" -eq 1 ]; then
+            echo "✅ Application output verified!"
           else
-            echo '❌ Application output verification failed!'
+            echo "❌ Application output verification failed!"
             exit 1
           fi
 
@@ -58,7 +58,7 @@ jobs:
         run: |
           docker build -t hello-devops:latest .
           docker images | grep hello-devops
-          echo '✅ Docker image built successfully!'
+          echo "✅ Docker image built successfully!"
 
   validate_nomad:
     name: Validate Nomad Job File
@@ -69,10 +69,13 @@ jobs:
       
       - name: Install Nomad
         run: |
-         NOMAD_VERSION=1.7.0
+          NOMAD_VERSION=1.7.0
           wget https://releases.hashicorp.com/nomad/${NOMAD_VERSION}/nomad_${NOMAD_VERSION}_linux_amd64.zip
-          sudo mv nomad /usr/local/bin/
+          unzip nomad_${NOMAD_VERSION}_linux_amd64.zip
+          chmod +x nomad
+          sudo mv nomad /usr/local/bin/nomad
+          which nomad
           nomad version
       
       - name: Validate Nomad job file
-        run: nomad validate nomad/hello.nomad
+        run: nomad job validate nomad/hello.nomad
